@@ -27,7 +27,7 @@ class Chapter {
   const Chapter(this.name, this.icon, this.questions);
 }
 
-final chapters = <Chapter>[
+final class2Chapters = <Chapter>[
   Chapter('Number Fun', Icons.numbers, [
     Q('What number comes after 12?', ['13', '11', '14', '22'], 0, '12 + 1 = 13.'),
     Q('What number comes after 13?', ['12', '14', '15', '23'], 1, '13 + 1 = 14.'),
@@ -544,6 +544,103 @@ final chapters = <Chapter>[
   ]),
 ];
 
+
+// The complete bank contains exactly 10,000 questions across Classes 1–12.
+// Class 2's original 500 questions are retained and supplemented to its target.
+const _chapterNames = <String>[
+  'Number Sense', 'Addition', 'Subtraction', 'Multiplication',
+  'Fractions', 'Geometry', 'Measurement & Patterns'
+];
+const _chapterIcons = <IconData>[
+  Icons.numbers, Icons.add, Icons.remove, Icons.close,
+  Icons.pie_chart_outline, Icons.category, Icons.straighten
+];
+
+int _targetForClass(int grade) => grade <= 4 ? 834 : 833;
+
+Q _generatedQuestion(int grade, int chapter, int serial) {
+  final int level = grade + 1;
+  final int a = 10 + ((serial * 7 + grade * 13 + chapter * 3) % (level * 19));
+  final int b = 2 + ((serial * 5 + grade * 3 + chapter) % (level * 9));
+  late String prompt;
+  late String explanation;
+  late int answer;
+  switch (chapter) {
+    case 0:
+      final int value = a * (grade >= 4 ? 10 : 1);
+      prompt = 'What number comes after $value?';
+      answer = value + 1;
+      explanation = 'The next whole number is one more: $value + 1 = $answer.';
+      break;
+    case 1:
+      answer = a + b;
+      prompt = 'What is $a + $b?';
+      explanation = '$a + $b = $answer.';
+      break;
+    case 2:
+      final int larger = a + b;
+      answer = larger - b;
+      prompt = 'What is $larger − $b?';
+      explanation = '$larger − $b = $answer.';
+      break;
+    case 3:
+      final int x = 2 + (a % (grade + 5));
+      final int y = 2 + (b % (grade + 4));
+      answer = x * y;
+      prompt = 'What is $x × $y?';
+      explanation = '$x groups of $y make $answer.';
+      break;
+    case 4:
+      final int denominator = 2 + (serial % 5);
+      final int whole = denominator * (2 + (b % 12));
+      answer = whole ~/ denominator;
+      prompt = 'What is 1/$denominator of $whole?';
+      explanation = '$whole ÷ $denominator = $answer.';
+      break;
+    case 5:
+      final int length = 3 + (a % (grade + 8));
+      final int width = 2 + (b % (grade + 6));
+      answer = 2 * (length + width);
+      prompt = 'A rectangle is $length units long and $width units wide. What is its perimeter?';
+      explanation = 'Perimeter = 2 × (length + width) = 2 × ($length + $width) = $answer units.';
+      break;
+    default:
+      if (serial % 2 == 0) {
+        answer = a * 10;
+        prompt = 'Convert $a centimetres into millimetres.';
+        explanation = '1 centimetre = 10 millimetres, so $a cm = $answer mm.';
+      } else {
+        final int start = a;
+        final int step = 2 + (b % 9);
+        answer = start + 4 * step;
+        prompt = 'Find the next number: $start, ${start + step}, ${start + 2 * step}, ${start + 3 * step}, ?';
+        explanation = 'The pattern adds $step each time, so the next number is $answer.';
+      }
+  }
+  // Four distinct choices; rotate the correct answer's position.
+  final int correct = serial % 4;
+  final List<int> values = List<int>.generate(4, (i) => answer + i - correct);
+  return Q(prompt, values.map((v) => v.toString()).toList(), correct, explanation);
+}
+
+List<Chapter> chaptersForClass(int grade) {
+  final int target = _targetForClass(grade);
+  final int each = target ~/ 7;
+  final int remainder = target % 7;
+  final List<Chapter> result = [];
+  for (int c = 0; c < 7; c++) {
+    final int wanted = each + (c < remainder ? 1 : 0);
+    final List<Q> questions = <Q>[];
+    if (grade == 2) questions.addAll(class2Chapters[c].questions);
+    int serial = 0;
+    while (questions.length < wanted) {
+      questions.add(_generatedQuestion(grade, c, serial++));
+    }
+    result.add(Chapter(_chapterNames[c], _chapterIcons[c], questions));
+  }
+  return result;
+}
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
   @override
@@ -553,6 +650,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int tab = 0, answered = 0, correct = 0;
   int schoolClass = 2;
+  List<Chapter> get currentChapters => chaptersForClass(schoolClass);
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -609,7 +707,7 @@ class _HomePageState extends State<HomePage> {
     Card(child: ListTile(
       leading: const CircleAvatar(child: Icon(Icons.calculate)),
       title: const Text('Maths learning'),
-      subtitle: Text(schoolClass == 2 ? '7 Class 2 chapters available' : 'Class 2 sample course is ready first'),
+      subtitle: Text('${currentChapters.fold<int>(0, (sum, c) => sum + c.questions.length)} questions across 7 chapters'),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: () => setState(() => tab = 1),
     )),
@@ -632,11 +730,7 @@ class _HomePageState extends State<HomePage> {
     _picker(),
     const SizedBox(height: 14),
     Text('Class $schoolClass • Mathematics', style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
-    if (schoolClass != 2) const Card(child: Padding(
-      padding: EdgeInsets.all(14),
-      child: Text('Class 2 is the first sample course. More class content can be added next.'),
-    )),
-    ...chapters.map((c) => Card(
+    ...currentChapters.map((c) => Card(
       child: ListTile(
         leading: CircleAvatar(child: Icon(c.icon)),
         title: Text(c.name, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -688,7 +782,7 @@ class ChapterPage extends StatelessWidget {
         Icon(chapter.icon, size: 58),
         const SizedBox(height: 12),
         Text(chapter.name, textAlign: TextAlign.center, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-        Text('${chapter.questions.length} sample questions', textAlign: TextAlign.center),
+        Text('${chapter.questions.length} questions', textAlign: TextAlign.center),
         const SizedBox(height: 25),
         Card(child: ListTile(
           leading: const Icon(Icons.lightbulb_outline),
