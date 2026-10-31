@@ -718,23 +718,8 @@ List<Chapter> chaptersForClass(int grade) {
       grouped[i],
     ),
   );
-}
-  final int target = _targetForClass(grade);
-  final int each = target ~/ 7;
-  final int remainder = target % 7;
-  final List<Chapter> result = [];
-  for (int c = 0; c < 7; c++) {
-    final int wanted = each + (c < remainder ? 1 : 0);
-    final List<Q> questions = <Q>[];
-    if (grade == 2) questions.addAll(class2Chapters[c].questions);
-    int serial = 0;
-    while (questions.length < wanted) {
-      questions.add(_generatedQuestion(grade, c, serial++));
-    }
-    result.add(Chapter(_chapterNames[c], _chapterIcons[c], questions));
-  }
-  return result;
-}
+
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
