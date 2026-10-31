@@ -1,6 +1,29 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'advanced_question_bank.dart';
-void main() => runApp(const QuestionBank());
+late Map<int, List<Map<String, dynamic>>> questionData;
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final String jsonString =
+      await rootBundle.loadString('question_bank_10000.json');
+
+  final Map<String, dynamic> decoded = jsonDecode(jsonString);
+
+  final List<dynamic> allQuestions = decoded['questions'];
+
+  questionData = {
+    for (int grade = 1; grade <= 12; grade++)
+      grade: allQuestions
+          .where((q) => q['class'] == grade)
+          .map((q) => Map<String, dynamic>.from(q))
+          .toList(),
+  };
+
+  runApp(const QuestionBank());
+}
 
 class QuestionBank extends StatelessWidget {
   const QuestionBank({super.key});
@@ -624,6 +647,78 @@ Q _generatedQuestion(int grade, int chapter, int serial) {
 }
 
 List<Chapter> chaptersForClass(int grade) {
+  const int target = 834;
+
+  final List<List<Q>> grouped =
+      List.generate(7, (_) => <Q>[]);
+
+  // Keep your existing Class 2 questions.
+  if (grade == 2) {
+    for (int i = 0; i < 7; i++) {
+      grouped[i].addAll(class2Chapters[i].questions);
+    }
+  }
+
+  final List<Map<String, dynamic>> imported =
+      questionData[grade] ?? [];
+
+  int serial = 0;
+
+  for (final item in imported) {
+    final int total = grouped.fold(
+      0,
+      (sum, chapter) => sum + chapter.length,
+    );
+
+    if (total >= target) break;
+
+    final String topic =
+        (item['topic'] ?? '').toString().toLowerCase();
+
+    int chapterIndex;
+
+    if (topic.contains('addition')) {
+      chapterIndex = 1;
+    } else if (topic.contains('subtraction')) {
+      chapterIndex = 2;
+    } else if (topic.contains('multiplication')) {
+      chapterIndex = 3;
+    } else if (topic.contains('fraction') ||
+        topic.contains('percent')) {
+      chapterIndex = 4;
+    } else if (topic.contains('geometry') ||
+        topic.contains('algebra') ||
+        topic.contains('polynomial')) {
+      chapterIndex = 5;
+    } else if (topic.contains('measurement') ||
+        topic.contains('mensuration') ||
+        topic.contains('data')) {
+      chapterIndex = 6;
+    } else {
+      chapterIndex = serial % 7;
+    }
+
+    grouped[chapterIndex].add(
+      Q(
+        item['question'].toString(),
+        List<String>.from(item['options']),
+        item['answerIndex'] as int,
+        item['explanation'].toString(),
+      ),
+    );
+
+    serial++;
+  }
+
+  return List<Chapter>.generate(
+    7,
+    (i) => Chapter(
+      _chapterNames[i],
+      _chapterIcons[i],
+      grouped[i],
+    ),
+  );
+}
   final int target = _targetForClass(grade);
   final int each = target ~/ 7;
   final int remainder = target % 7;
