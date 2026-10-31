@@ -1,364 +1,340 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(const QuestionBankApp());
+void main() => runApp(const QuestionBank());
 
-class QuestionBankApp extends StatelessWidget {
-  const QuestionBankApp({super.key});
-
+class QuestionBank extends StatelessWidget {
+  const QuestionBank({super.key});
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'QUESTION BANK',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6554D9)),
-        scaffoldBackgroundColor: const Color(0xFFF7F7FC),
-        fontFamily: 'Roboto',
-      ),
-      home: const MainShell(),
-    );
-  }
+  Widget build(BuildContext context) => MaterialApp(
+    title: 'QUESTION BANK',
+    debugShowCheckedModeBanner: false,
+    theme: ThemeData(colorSchemeSeed: const Color(0xFF3157C8), useMaterial3: true),
+    home: const HomePage(),
+  );
 }
 
-class Question {
-  final String prompt;
+class Q {
+  final String text, explanation;
   final List<String> options;
   final int answer;
-  final String explanation;
-  const Question(this.prompt, this.options, this.answer, this.explanation);
+  const Q(this.text, this.options, this.answer, this.explanation);
 }
 
-const classTwoQuestions = <Question>[
-  Question('What is 8 + 7?', ['13', '14', '15', '16'], 2, '8 + 7 = 15.'),
-  Question('What is 20 - 6?', ['12', '13', '14', '15'], 2, '20 - 6 = 14.'),
-  Question('Which number comes after 49?', ['48', '50', '51', '59'], 1, '50 comes immediately after 49.'),
-  Question('How many sides does a triangle have?', ['2', '3', '4', '5'], 1, 'A triangle has 3 sides.'),
-  Question('What is 5 groups of 2?', ['7', '8', '10', '12'], 2, '5 groups of 2 means 5 × 2 = 10.'),
-  Question('Which is the smallest number?', ['32', '23', '42', '34'], 1, '23 is the smallest number.'),
-  Question('How many days are there in one week?', ['5', '6', '7', '8'], 2, 'There are 7 days in a week.'),
-  Question('You have ₹10 and spend ₹4. How much is left?', ['₹4', '₹5', '₹6', '₹7'], 2, '₹10 - ₹4 = ₹6.'),
-  Question('What is 10 + 10 + 10?', ['20', '25', '30', '40'], 2, '10 + 10 + 10 = 30.'),
-  Question('Which shape has no corners?', ['Square', 'Circle', 'Triangle', 'Rectangle'], 1, 'A circle has no corners.'),
+class Chapter {
+  final String name;
+  final IconData icon;
+  final List<Q> questions;
+  const Chapter(this.name, this.icon, this.questions);
+}
+
+const chapters = <Chapter>[
+  Chapter('Number Fun', Icons.numbers, [
+    Q('Which number comes after 39?', ['38','40','41','29'], 1, '40 comes immediately after 39.'),
+    Q('What is the place value of 5 in 52?', ['5','50','2','20'], 1, '5 is in the tens place, so its value is 50.'),
+    Q('Which is the greatest number?', ['27','72','62','17'], 1, '72 is the greatest number here.'),
+    Q('How many tens are there in 80?', ['8','80','0','10'], 0, '80 is made of 8 tens.'),
+    Q('What is 10 more than 34?', ['35','40','44','24'], 2, '34 + 10 = 44.'),
+  ]),
+  Chapter('Addition', Icons.add_circle_outline, [
+    Q('What is 12 + 5?', ['16','17','18','15'], 1, '12 + 5 = 17.'),
+    Q('What is 23 + 14?', ['36','37','38','35'], 1, '20 + 10 = 30 and 3 + 4 = 7. Total 37.'),
+    Q('Riya has 8 pencils and gets 6 more. How many?', ['12','13','14','15'], 2, '8 + 6 = 14 pencils.'),
+    Q('What is 30 + 20?', ['40','50','60','70'], 1, '3 tens + 2 tens = 5 tens.'),
+    Q('What is 9 + 9?', ['16','17','18','19'], 2, '9 + 9 = 18.'),
+  ]),
+  Chapter('Subtraction', Icons.remove_circle_outline, [
+    Q('What is 15 − 4?', ['9','10','11','12'], 2, '15 − 4 = 11.'),
+    Q('What is 28 − 10?', ['18','19','20','17'], 0, '28 − 10 = 18.'),
+    Q('12 birds sit on a tree. 5 fly away. How many remain?', ['6','7','8','9'], 1, '12 − 5 = 7 birds.'),
+    Q('What is 40 − 20?', ['10','20','30','40'], 1, '4 tens − 2 tens = 2 tens.'),
+    Q('What is 17 − 9?', ['7','8','9','6'], 1, '17 − 9 = 8.'),
+  ]),
+  Chapter('Multiplication', Icons.close, [
+    Q('What is 3 × 2?', ['5','6','7','8'], 1, '3 groups of 2 make 6.'),
+    Q('What is 2 × 5?', ['7','8','10','12'], 2, '2 groups of 5 make 10.'),
+    Q('What is 4 × 2?', ['6','8','10','12'], 1, '4 + 4 = 8.'),
+    Q('3 bags have 4 oranges each. How many oranges?', ['7','10','12','14'], 2, '3 groups of 4 make 12.'),
+    Q('What is 5 × 1?', ['0','1','5','10'], 2, 'Any number multiplied by 1 stays the same.'),
+  ]),
+  Chapter('Shapes', Icons.category, [
+    Q('How many sides does a triangle have?', ['2','3','4','5'], 1, 'A triangle has 3 sides.'),
+    Q('Which shape has 4 equal sides?', ['Circle','Triangle','Square','Oval'], 2, 'A square has 4 equal sides.'),
+    Q('Which shape is round?', ['Circle','Rectangle','Square','Triangle'], 0, 'A circle is round and has no corners.'),
+    Q('How many corners does a rectangle have?', ['2','3','4','5'], 2, 'A rectangle has 4 corners.'),
+    Q('Which object is shaped like a sphere?', ['Book','Ball','Door','Box'], 1, 'A ball is shaped like a sphere.'),
+  ]),
+  Chapter('Measurement', Icons.straighten, [
+    Q('Which is heavier?', ['Feather','Elephant','Leaf','Paper'], 1, 'An elephant is much heavier.'),
+    Q('We measure a pencil in:', ['Litres','Centimetres','Kilograms','Hours'], 1, 'Centimetres measure short lengths.'),
+    Q('Which holds more water?', ['Cup','Bucket','Spoon','Bottle cap'], 1, 'A bucket holds more water.'),
+    Q('Which is shorter?', ['1 metre','50 centimetres','2 metres','3 metres'], 1, '50 centimetres is half a metre.'),
+    Q('Milk is commonly measured in:', ['Litres','Metres','Hours','Kilograms'], 0, 'Litres measure liquids.'),
+  ]),
+  Chapter('Time and Money', Icons.access_time, [
+    Q('How many days are in a week?', ['5','6','7','8'], 2, 'There are 7 days in a week.'),
+    Q('How many months are in a year?', ['10','11','12','13'], 2, 'There are 12 months in a year.'),
+    Q('Which coin has a value of ₹5?', ['₹1','₹2','₹5','₹10'], 2, 'The ₹5 coin is worth five rupees.'),
+    Q('How many minutes are in one hour?', ['30','45','60','100'], 2, 'One hour has 60 minutes.'),
+    Q('A toy costs ₹10. You pay ₹20. What change do you get?', ['₹5','₹10','₹15','₹20'], 1, '₹20 − ₹10 = ₹10 change.'),
+  ]),
 ];
 
-class MainShell extends StatefulWidget {
-  const MainShell({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
   @override
-  State<MainShell> createState() => _MainShellState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MainShellState extends State<MainShell> {
-  int tab = 0;
-  int selectedClass = 2;
-  int totalTests = 0;
-  int bestScore = 0;
-
-  void openQuiz() async {
-    final score = await Navigator.push<int>(
-      context,
-      MaterialPageRoute(builder: (_) => QuizScreen(classNumber: selectedClass)),
-    );
-    if (score != null) {
-      setState(() {
-        totalTests++;
-        if (score > bestScore) bestScore = score;
-      });
-    }
-  }
+class _HomePageState extends State<HomePage> {
+  int tab = 0, answered = 0, correct = 0;
+  int schoolClass = 2;
 
   @override
-  Widget build(BuildContext context) {
-    final pages = [
-      HomeScreen(
-        selectedClass: selectedClass,
-        onClassChanged: (v) => setState(() => selectedClass = v),
-        onStart: openQuiz,
-        onNavigate: (v) => setState(() => tab = v),
-        totalTests: totalTests,
-        bestScore: bestScore,
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(
+      title: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('QUESTION BANK', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1)),
+        Text('Learn • Practise • Succeed', style: TextStyle(fontSize: 11)),
+      ]),
+    ),
+    body: IndexedStack(index: tab, children: [_home(), _chapters(), _results(), _account()]),
+    bottomNavigationBar: NavigationBar(
+      selectedIndex: tab,
+      onDestinationSelected: (v) => setState(() => tab = v),
+      destinations: const [
+        NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
+        NavigationDestination(icon: Icon(Icons.menu_book_outlined), label: 'Chapters'),
+        NavigationDestination(icon: Icon(Icons.emoji_events_outlined), label: 'Results'),
+        NavigationDestination(icon: Icon(Icons.person_outline), label: 'Account'),
+      ],
+    ),
+  );
+
+  Widget _picker() => Card(child: Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 14),
+    child: Row(children: [
+      const Icon(Icons.school),
+      const SizedBox(width: 12),
+      const Expanded(child: Text('Select your class')),
+      DropdownButton<int>(
+        value: schoolClass,
+        items: List.generate(12, (i) => DropdownMenuItem(value: i + 1, child: Text('Class ${i + 1}'))),
+        onChanged: (v) => setState(() => schoolClass = v ?? 2),
       ),
-      ChaptersScreen(classNumber: selectedClass, onStart: openQuiz),
-      TestSeriesScreen(classNumber: selectedClass, onStart: openQuiz),
-      ResultsScreen(totalTests: totalTests, bestScore: bestScore),
-      const AccountScreen(),
-    ];
+    ]),
+  ));
 
-    return Scaffold(
-      body: SafeArea(child: pages[tab]),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: tab,
-        onDestinationSelected: (v) => setState(() => tab = v),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.menu_book_outlined), selectedIcon: Icon(Icons.menu_book), label: 'Chapters'),
-          NavigationDestination(icon: Icon(Icons.assignment_outlined), selectedIcon: Icon(Icons.assignment), label: 'Tests'),
-          NavigationDestination(icon: Icon(Icons.bar_chart_outlined), selectedIcon: Icon(Icons.bar_chart), label: 'Results'),
-          NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: 'Account'),
-        ],
+  Widget _home() => ListView(padding: const EdgeInsets.all(16), children: [
+    Container(
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        gradient: const LinearGradient(colors: [Color(0xFF172554), Color(0xFF3157C8)]),
       ),
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  final int selectedClass, totalTests, bestScore;
-  final ValueChanged<int> onClassChanged;
-  final VoidCallback onStart;
-  final ValueChanged<int> onNavigate;
-  const HomeScreen({super.key, required this.selectedClass, required this.onClassChanged,
-    required this.onStart, required this.onNavigate, required this.totalTests, required this.bestScore});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(padding: const EdgeInsets.all(20), children: [
-      Row(children: [
-        Container(padding: const EdgeInsets.all(11), decoration: BoxDecoration(
-          color: const Color(0xFFECE9FF), borderRadius: BorderRadius.circular(14)),
-          child: const Icon(Icons.auto_stories, color: Color(0xFF6554D9), size: 28)),
-        const SizedBox(width: 12),
-        const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('QUESTION BANK', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: .4)),
-          Text('Learn • Practice • Succeed', style: TextStyle(color: Colors.black54)),
-        ])),
-        IconButton(onPressed: () => onNavigate(4), icon: const Icon(Icons.account_circle_outlined, size: 29)),
+      child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('Welcome to QUESTION BANK!', style: TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.bold)),
+        SizedBox(height: 8),
+        Text('Build strong Maths skills, one chapter at a time.', style: TextStyle(color: Colors.white70)),
       ]),
-      const SizedBox(height: 24),
-      Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFF6554D9), Color(0xFF8878F0)]),
-        borderRadius: BorderRadius.circular(24)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('Your learning journey starts here!', style: TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 7),
-          const Text('Choose your class and practise every day.', style: TextStyle(color: Colors.white70)),
-          const SizedBox(height: 16),
-          DropdownButtonFormField<int>(
-            value: selectedClass,
-            dropdownColor: Colors.white,
-            decoration: InputDecoration(filled: true, fillColor: Colors.white, labelText: 'Select class',
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(13), borderSide: BorderSide.none)),
-            items: List.generate(12, (i) => DropdownMenuItem(value: i + 1, child: Text('Class ${i + 1}'))),
-            onChanged: (v) { if (v != null) onClassChanged(v); },
-          ),
-        ])),
-      const SizedBox(height: 22),
-      const Text('Explore learning', style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
-      const SizedBox(height: 12),
-      Row(children: [
-        Expanded(child: _HomeTile(icon: Icons.calculate_outlined, title: 'Maths practice', subtitle: 'Solve questions', color: const Color(0xFFECE9FF), onTap: onStart)),
-        const SizedBox(width: 12),
-        Expanded(child: _HomeTile(icon: Icons.assignment_turned_in_outlined, title: 'Test series', subtitle: 'Check your skills', color: const Color(0xFFFFF0D9), onTap: () => onNavigate(2))),
-      ]),
-      const SizedBox(height: 12),
-      Row(children: [
-        Expanded(child: _HomeTile(icon: Icons.library_books_outlined, title: 'Chapters', subtitle: 'Learn by topic', color: const Color(0xFFE1F6EC), onTap: () => onNavigate(1))),
-        const SizedBox(width: 12),
-        Expanded(child: _HomeTile(icon: Icons.emoji_events_outlined, title: 'My results', subtitle: 'Track progress', color: const Color(0xFFFFE8EE), onTap: () => onNavigate(3))),
-      ]),
-      const SizedBox(height: 22),
-      const Text('Your progress', style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
-      const SizedBox(height: 12),
-      Row(children: [
-        Expanded(child: _StatCard(label: 'Tests taken', value: '$totalTests', icon: Icons.edit_note)),
-        const SizedBox(width: 10),
-        Expanded(child: _StatCard(label: 'Best score', value: '$bestScore / 10', icon: Icons.star_outline)),
-      ]),
-      const SizedBox(height: 20),
-      const Text('Available subjects', style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
-      const SizedBox(height: 10),
-      const ListTile(leading: CircleAvatar(backgroundColor: Color(0xFFECE9FF), child: Icon(Icons.calculate, color: Color(0xFF6554D9))),
-        title: Text('Mathematics'), subtitle: Text('Available demo questions for Class 2')),
-      const ListTile(leading: CircleAvatar(child: Icon(Icons.science_outlined)), title: Text('Science'),
-        subtitle: Text('Subject section – content can be added')),
-      const ListTile(leading: CircleAvatar(child: Icon(Icons.spellcheck)), title: Text('English'),
-        subtitle: Text('Subject section – content can be added')),
-    ]);
-  }
-}
-
-class _HomeTile extends StatelessWidget {
-  final IconData icon; final String title, subtitle; final Color color; final VoidCallback onTap;
-  const _HomeTile({required this.icon, required this.title, required this.subtitle, required this.color, required this.onTap});
-  @override Widget build(BuildContext context) => InkWell(onTap: onTap, borderRadius: BorderRadius.circular(18),
-    child: Container(padding: const EdgeInsets.all(15), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18)),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        CircleAvatar(backgroundColor: color, child: Icon(icon, color: const Color(0xFF5142B5))),
-        const SizedBox(height: 12), Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        Text(subtitle, style: const TextStyle(color: Colors.black54, fontSize: 12)),
-      ])));
-}
-
-class _StatCard extends StatelessWidget {
-  final String label, value; final IconData icon;
-  const _StatCard({required this.label, required this.value, required this.icon});
-  @override Widget build(BuildContext context) => Container(padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(17)),
-    child: Row(children: [Icon(icon, color: const Color(0xFF6554D9)), const SizedBox(width: 10),
-      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-        Text(label, style: const TextStyle(color: Colors.black54, fontSize: 12)),
-      ])]));
-}
-
-List<String> chaptersFor(int c) {
-  if (c == 2) return ['Numbers and counting', 'Addition', 'Subtraction', 'Multiplication basics',
-    'Shapes and patterns', 'Time and calendar', 'Money', 'Measurement', 'Word problems'];
-  return ['Number systems', 'Basic operations', 'Fractions and decimals', 'Geometry',
-    'Measurement and data', 'Word problems', 'Revision practice'];
-}
-
-class ChaptersScreen extends StatelessWidget {
-  final int classNumber; final VoidCallback onStart;
-  const ChaptersScreen({super.key, required this.classNumber, required this.onStart});
-  @override Widget build(BuildContext context) => ListView(padding: const EdgeInsets.all(20), children: [
-    const Text('Chapters', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
-    Text('Class $classNumber • Mathematics', style: const TextStyle(color: Colors.black54)),
+    ),
     const SizedBox(height: 16),
-    ...chaptersFor(classNumber).asMap().entries.map((e) => Card(color: Colors.white, child: ListTile(
-      leading: CircleAvatar(backgroundColor: const Color(0xFFECE9FF), child: Text('${e.key + 1}')),
-      title: Text(e.value), subtitle: const Text('Lesson and practice questions'),
-      trailing: const Icon(Icons.chevron_right), onTap: onStart))),
+    _picker(),
+    const SizedBox(height: 14),
+    const Text('Mathematics', style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
+    Card(child: ListTile(
+      leading: const CircleAvatar(child: Icon(Icons.calculate)),
+      title: const Text('Maths learning'),
+      subtitle: Text(schoolClass == 2 ? '7 Class 2 chapters available' : 'Class 2 sample course is ready first'),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+      onTap: () => setState(() => tab = 1),
+    )),
     const SizedBox(height: 12),
-    const Text('Note: Class 2 currently includes the first demo question set. Other classes have starter chapter lists ready for content.', style: TextStyle(color: Colors.black54)),
-  ]);
-}
-
-class TestSeriesScreen extends StatelessWidget {
-  final int classNumber; final VoidCallback onStart;
-  const TestSeriesScreen({super.key, required this.classNumber, required this.onStart});
-  @override Widget build(BuildContext context) => ListView(padding: const EdgeInsets.all(20), children: [
-    const Text('Test Series', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
-    Text('Class $classNumber • Mathematics', style: const TextStyle(color: Colors.black54)),
+    Row(children: [
+      Expanded(child: _stat('Answered', answered.toString(), Icons.quiz_outlined)),
+      const SizedBox(width: 10),
+      Expanded(child: _stat('Correct', correct.toString(), Icons.check_circle_outline)),
+    ]),
     const SizedBox(height: 18),
-    _TestCard(title: 'Quick Practice', detail: '10 questions • No time limit', icon: Icons.bolt, onTap: onStart),
-    _TestCard(title: 'Weekly Test', detail: '10 questions • Practice mode', icon: Icons.calendar_month, onTap: onStart),
-    _TestCard(title: 'Mock Examination', detail: '10 questions • Demo test', icon: Icons.school_outlined, onTap: onStart),
-    const SizedBox(height: 10),
-    const Text('Timed exams, saved test history and a larger question library can be connected in the next development stage.', style: TextStyle(color: Colors.black54)),
+    FilledButton.icon(onPressed: () => setState(() => tab = 1), icon: const Icon(Icons.play_arrow), label: const Text('Explore chapters')),
   ]);
-}
 
-class _TestCard extends StatelessWidget {
-  final String title, detail; final IconData icon; final VoidCallback onTap;
-  const _TestCard({required this.title, required this.detail, required this.icon, required this.onTap});
-  @override Widget build(BuildContext context) => Card(color: Colors.white, child: ListTile(
-    contentPadding: const EdgeInsets.all(14), leading: CircleAvatar(backgroundColor: const Color(0xFFECE9FF), child: Icon(icon, color: const Color(0xFF6554D9))),
-    title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)), subtitle: Text(detail),
-    trailing: const Icon(Icons.play_circle_fill, color: Color(0xFF6554D9)), onTap: onTap));
-}
+  Widget _stat(String label, String value, IconData icon) => Card(child: Padding(
+    padding: const EdgeInsets.all(16),
+    child: Column(children: [Icon(icon), Text(value, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)), Text(label)]),
+  ));
 
-class ResultsScreen extends StatelessWidget {
-  final int totalTests, bestScore;
-  const ResultsScreen({super.key, required this.totalTests, required this.bestScore});
-  @override Widget build(BuildContext context) => Padding(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    const Text('My Results', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
-    const SizedBox(height: 18),
-    _StatCard(label: 'Tests completed this session', value: '$totalTests', icon: Icons.assignment_turned_in),
-    const SizedBox(height: 12),
-    _StatCard(label: 'Best score', value: '$bestScore / 10', icon: Icons.emoji_events),
-    const SizedBox(height: 20),
-    const Text('Keep practising!', style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
-    const Text('Your scores are shown during this app session. Persistent accounts and cloud-saved history are planned for the next stage.', style: TextStyle(color: Colors.black54)),
+  Widget _chapters() => ListView(padding: const EdgeInsets.all(16), children: [
+    _picker(),
+    const SizedBox(height: 14),
+    Text('Class $schoolClass • Mathematics', style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
+    if (schoolClass != 2) const Card(child: Padding(
+      padding: EdgeInsets.all(14),
+      child: Text('Class 2 is the first sample course. More class content can be added next.'),
+    )),
+    ...chapters.map((c) => Card(
+      child: ListTile(
+        leading: CircleAvatar(child: Icon(c.icon)),
+        title: Text(c.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: const Text('Practice and chapter test'),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChapterPage(
+          chapter: c,
+          onDone: (a, b) => setState(() { answered += a; correct += b; }),
+        ))),
+      ),
+    )),
+  ]);
+
+  Widget _results() => Center(child: Card(
+    margin: const EdgeInsets.all(20),
+    child: Padding(padding: const EdgeInsets.all(24), child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(Icons.emoji_events, size: 55, color: Colors.amber),
+        const Text('Your results', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+        Text('$correct / $answered correct', style: const TextStyle(fontSize: 26)),
+        Text(answered == 0 ? 'Complete a practice session or test to see your progress.' : 'Keep practising to improve!'),
+      ],
+    )),
+  ));
+
+  Widget _account() => const Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+    CircleAvatar(radius: 36, child: Icon(Icons.person, size: 40)),
+    SizedBox(height: 10),
+    Text('Student Account', style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold)),
+    Text('Premium features coming soon'),
+    SizedBox(height: 8),
+    Text('About QUESTION BANK'),
   ]));
 }
 
-class AccountScreen extends StatelessWidget {
-  const AccountScreen({super.key});
-  @override Widget build(BuildContext context) => ListView(padding: const EdgeInsets.all(20), children: const [
-    Text('Account', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
-    SizedBox(height: 20),
-    CircleAvatar(radius: 36, child: Icon(Icons.person, size: 38)),
-    SizedBox(height: 10),
-    Center(child: Text('Guest learner', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
-    SizedBox(height: 20),
-    Card(child: ListTile(leading: Icon(Icons.workspace_premium), title: Text('Premium membership'), subtitle: Text('Premium plans can be configured later.'))),
-    Card(child: ListTile(leading: Icon(Icons.settings_outlined), title: Text('Settings'), subtitle: Text('App preferences'))),
-    Card(child: ListTile(leading: Icon(Icons.info_outline), title: Text('About QUESTION BANK'), subtitle: Text('Learn • Practice • Succeed'))),
-  ]);
+class ChapterPage extends StatelessWidget {
+  final Chapter chapter;
+  final void Function(int, int) onDone;
+  const ChapterPage({super.key, required this.chapter, required this.onDone});
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: Text(chapter.name)),
+    body: Padding(padding: const EdgeInsets.all(18), child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: 25),
+        Icon(chapter.icon, size: 58),
+        const SizedBox(height: 12),
+        Text(chapter.name, textAlign: TextAlign.center, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+        Text('${chapter.questions.length} sample questions', textAlign: TextAlign.center),
+        const SizedBox(height: 25),
+        Card(child: ListTile(
+          leading: const Icon(Icons.lightbulb_outline),
+          title: const Text('Practice mode'),
+          subtitle: const Text('See the answer and explanation after each question.'),
+          onTap: () => _start(context, false),
+        )),
+        Card(child: ListTile(
+          leading: const Icon(Icons.assignment_outlined),
+          title: const Text('Chapter test'),
+          subtitle: const Text('Get your final score at the end.'),
+          onTap: () => _start(context, true),
+        )),
+      ],
+    )),
+  );
+
+  void _start(BuildContext context, bool test) => Navigator.push(context, MaterialPageRoute(
+    builder: (_) => QuizPage(chapter: chapter, test: test, onDone: onDone),
+  ));
 }
 
-class QuizScreen extends StatefulWidget {
-  final int classNumber;
-  const QuizScreen({super.key, required this.classNumber});
-  @override State<QuizScreen> createState() => _QuizScreenState();
+class QuizPage extends StatefulWidget {
+  final Chapter chapter;
+  final bool test;
+  final void Function(int, int) onDone;
+  const QuizPage({super.key, required this.chapter, required this.test, required this.onDone});
+  @override
+  State<QuizPage> createState() => _QuizPageState();
 }
 
-class _QuizScreenState extends State<QuizScreen> {
+class _QuizPageState extends State<QuizPage> {
   int index = 0, score = 0;
   int? selected;
-  bool submitted = false;
-  late final List<Question> questions;
+  bool checked = false;
+  Q get q => widget.chapter.questions[index];
 
-  @override void initState() {
-    super.initState();
-    questions = widget.classNumber == 2 ? classTwoQuestions : _starterQuestions(widget.classNumber);
-  }
-
-  void submit() {
-    if (selected == null) return;
-    setState(() { submitted = true; if (selected == questions[index].answer) score++; });
+  void choose(int n) {
+    if (checked) return;
+    setState(() { selected = n; if (!widget.test) checked = true; });
   }
 
   void next() {
-    if (index == questions.length - 1) {
-      Navigator.pop(context, score);
+    if (selected == null) return;
+    if (selected == q.answer) score++;
+    if (index == widget.chapter.questions.length - 1) {
+      widget.onDone(widget.chapter.questions.length, score);
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) =>
+        ScorePage(score: score, total: widget.chapter.questions.length, test: widget.test)));
     } else {
-      setState(() { index++; selected = null; submitted = false; });
+      setState(() { index++; selected = null; checked = false; });
     }
   }
 
-  @override Widget build(BuildContext context) {
-    final q = questions[index];
-    return Scaffold(
-      appBar: AppBar(title: Text('Class ${widget.classNumber} • Maths Test'), backgroundColor: const Color(0xFFF7F7FC)),
-      body: Padding(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text('Question ${index + 1} of ${questions.length}', style: const TextStyle(fontWeight: FontWeight.bold)),
-          Text('Score: $score', style: const TextStyle(color: Color(0xFF6554D9), fontWeight: FontWeight.bold)),
-        ]),
-        const SizedBox(height: 10),
-        LinearProgressIndicator(value: (index + 1) / questions.length, minHeight: 7, borderRadius: BorderRadius.circular(10)),
-        const SizedBox(height: 28),
-        Text(q.prompt, style: const TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 20),
-        ...List.generate(q.options.length, (i) {
-          final isChosen = selected == i;
-          final isCorrect = submitted && i == q.answer;
-          final isWrong = submitted && isChosen && i != q.answer;
-          return Container(margin: const EdgeInsets.only(bottom: 10), child: InkWell(
-            onTap: submitted ? null : () => setState(() => selected = i),
-            borderRadius: BorderRadius.circular(14),
-            child: Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(
-              color: isCorrect ? const Color(0xFFE1F6EC) : isWrong ? const Color(0xFFFFE8EE) : isChosen ? const Color(0xFFECE9FF) : Colors.white,
-              border: Border.all(color: isCorrect ? Colors.green : isWrong ? Colors.red : isChosen ? const Color(0xFF6554D9) : Colors.black12),
-              borderRadius: BorderRadius.circular(14)),
-              child: Row(children: [Expanded(child: Text('${String.fromCharCode(65+i)}. ${q.options[i]}', style: const TextStyle(fontSize: 16))),
-                if (isCorrect) const Icon(Icons.check_circle, color: Colors.green),
-                if (isWrong) const Icon(Icons.cancel, color: Colors.red),
-              ])),
-          ));
-        }),
-        if (submitted) Container(width: double.infinity, padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: const Color(0xFFECE9FF), borderRadius: BorderRadius.circular(14)),
-          child: Text(q.explanation, style: const TextStyle(fontWeight: FontWeight.w500))),
-        const Spacer(),
-        SizedBox(width: double.infinity, child: FilledButton(
-          onPressed: submitted ? next : (selected == null ? null : submit),
-          child: Text(submitted ? (index == questions.length - 1 ? 'Finish test' : 'Next question') : 'Check answer'),
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: Text(widget.test ? 'Chapter Test' : 'Practice')),
+    body: ListView(padding: const EdgeInsets.all(16), children: [
+      LinearProgressIndicator(value: (index + 1) / widget.chapter.questions.length),
+      const SizedBox(height: 12),
+      Text('Question ${index + 1} of ${widget.chapter.questions.length}'),
+      const SizedBox(height: 14),
+      Text(q.text, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+      const SizedBox(height: 16),
+      ...q.options.asMap().entries.map((e) {
+        final right = e.key == q.answer;
+        final chosen = e.key == selected;
+        Color? bg;
+        if (checked && !widget.test && right) bg = Colors.green.shade100;
+        if (checked && !widget.test && chosen && !right) bg = Colors.red.shade100;
+        return Card(color: bg, child: ListTile(
+          leading: CircleAvatar(child: Text(String.fromCharCode(65 + e.key))),
+          title: Text(e.value),
+          trailing: chosen ? const Icon(Icons.check_circle) : null,
+          onTap: () => choose(e.key),
+        ));
+      }),
+      if (checked && !widget.test) Card(
+        color: Colors.blue.shade50,
+        child: Padding(padding: const EdgeInsets.all(14), child: Text(
+          '${selected == q.answer ? 'Correct!' : 'Try to remember:'} ${q.explanation}',
         )),
-      ])),
+      ),
+      const SizedBox(height: 16),
+      FilledButton(onPressed: selected == null ? null : next,
+        child: Text(index == widget.chapter.questions.length - 1 ? 'Finish' : 'Next')),
+    ]),
+  );
+}
+
+class ScorePage extends StatelessWidget {
+  final int score, total;
+  final bool test;
+  const ScorePage({super.key, required this.score, required this.total, required this.test});
+  @override
+  Widget build(BuildContext context) {
+    final pct = (score * 100 / total).round();
+    return Scaffold(
+      appBar: AppBar(title: const Text('Your Score')),
+      body: Center(child: Padding(padding: const EdgeInsets.all(24), child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.emoji_events, size: 76, color: Colors.amber),
+          const SizedBox(height: 12),
+          Text(test ? 'Chapter test complete!' : 'Practice complete!', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+          Text('$score / $total', style: const TextStyle(fontSize: 42, fontWeight: FontWeight.bold)),
+          Text('$pct% correct'),
+          const SizedBox(height: 20),
+          FilledButton(onPressed: () => Navigator.popUntil(context, (r) => r.isFirst), child: const Text('Back to home')),
+        ],
+      ))),
     );
   }
 }
-
-List<Question> _starterQuestions(int c) => const [
-  Question('Which number is greater: 18 or 25?', ['18', '25', 'Both are equal', 'Cannot tell'], 1, '25 is greater than 18.'),
-  Question('What is 6 + 9?', ['13', '14', '15', '16'], 2, '6 + 9 = 15.'),
-  Question('What is 14 - 5?', ['7', '8', '9', '10'], 2, '14 - 5 = 9.'),
-  Question('How many sides does a square have?', ['3', '4', '5', '6'], 1, 'A square has four sides.'),
-  Question('What comes next: 2, 4, 6, ...?', ['7', '8', '9', '10'], 1, 'The pattern increases by 2.'),
-  Question('Which is an even number?', ['7', '9', '12', '15'], 2, '12 is divisible by 2.'),
-  Question('How many months are in a year?', ['10', '11', '12', '13'], 2, 'A year has 12 months.'),
-  Question('What is half of 10?', ['2', '4', '5', '6'], 2, 'Half of 10 is 5.'),
-  Question('Which shape is round?', ['Triangle', 'Square', 'Circle', 'Rectangle'], 2, 'A circle is round.'),
-  Question('What is 3 × 2?', ['5', '6', '7', '8'], 1, '3 × 2 = 6.'),
-];
