@@ -717,8 +717,7 @@ List<Chapter> chaptersForClass(int grade) {
       _chapterIcons[i],
       grouped[i],
     ),
-  );
-
+    }
 
 
 class HomePage extends StatefulWidget {
